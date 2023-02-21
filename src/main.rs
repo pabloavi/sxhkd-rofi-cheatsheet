@@ -27,7 +27,10 @@ fn main() {
     symbols.insert("@space", "␣ ");
     symbols.insert("Escape", "ESC ");
 
-    let file = File::open("/home/pablo/.config/sxhkd/sxhkdrc").unwrap();
+    // get username
+    let username = whoami();
+    let file = File::open(format!("/home/{}/.config/sxhkd/sxhkdrc", username)).unwrap();
+
     let reader = BufReader::new(file);
 
     let mut keybindings = Vec::new();
@@ -37,12 +40,18 @@ fn main() {
 
     // FIRST LINES
     keybindings.push("bspwmrc".to_string());
-    commands.push("alacritty -e nvim /home/pablo/.config/bspwm/bspwmrc".to_string());
+    commands.push(format!(
+        "wezterm start nvim /home/{}/.config/bspwm/bspwmrc",
+        username
+    ));
     descriptions.push("Edit bspwmrc".to_string());
     line_numbers_of_keybindings.push(0);
 
     keybindings.push("sxhkdrc".to_string());
-    commands.push("alacritty -e nvim /home/pablo/.config/sxhkd/sxhkdrc".to_string());
+    commands.push(format!(
+        "wezterm start nvim /home/{}/.config/sxhkd/sxhkdrc",
+        username
+    ));
     descriptions.push("Edit sxhkdrc".to_string());
     line_numbers_of_keybindings.push(0);
 
@@ -223,4 +232,9 @@ fn exec(command: &str, input: &str) -> String {
 
     // return the output
     output
+}
+
+fn whoami() -> String {
+    let output = exec("whoami", "");
+    output.trim_end().to_string()
 }
